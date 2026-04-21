@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Yehnuu — Forge of Worlds</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cormorant+SC:wght@300;400;600&family=Uncial+Antiqua&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+    :root {
+      --void:#04030a;
+      --abyss:#080612;
+      --deep:#0d0b18;
+      --veil:#14112a;
+      --shroud:#1e1a38;
+      --mist:#2d2850;
+      --blood:#7a1a2e;
+      --blood-bright:#a82a42;
+      --crimson:#c0364e;
+      --violet:#6b3fa0;
+      --violet-mid:#8a55c4;
+      --violet-light:#b07de8;
+      --lilac:#d4b0f0;
+      --bone:#d8cfc4;
+      --parchment:#ede4d6;
+      --ghost:#f2ece2;
+      --stone:#7a7080;
+      --fog:#a098b0;
+      --gold:#b8904a;
+      --gold-bright:#d4ac68;
+    }
+
+    html{scroll-behavior:smooth}
+
+    body{
+      background:var(--void);
+      color:var(--bone);
+      font-family:'Cormorant Garamond',Georgia,serif;
+      font-size:19px;
+      line-height:1.75;
+      overflow-x:hidden;
+    }
+
+    body::after{
+      content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)' opacity='0.035'/%3E%3C/svg%3E");
+      opacity:0.6;
+    }
+
+    nav{
+      position:fixed;top:0;left:0;right:0;z-index:200;
+      display:flex;align-items:center;justify-content:space-between;
+      padding:1.8rem 5rem;
+      background:linear-gradient(to bottom,rgba(4,3,10,0.96),rgba(4,3,10,0));
+    }
+
+    .n-logo{
+      font-family:'Uncial Antiqua',serif;
+      font-size:1.35rem;color:var(--violet-light);
+      text-decoration:none;letter-spacing:0.06em;
+    }
+
+    .n-links{display:flex;gap:2.5rem;list-style:none}
+    .n-links a{
+      font-family:'Cormorant SC',serif;font-size:0.72rem;
+      letter-spacing:0.22em;color:var(--stone);text-decoration:none;transition:color .3s;
+    }
+    .n-links a:hover{color:var(--lilac)}
+
+    /* HERO */
+    .hero{
+      position:relative;min-height:100vh;
+      display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+      padding-bottom:10vh;overflow:hidden;
+    }
+
+    .hero-canvas{
+      position:absolute;inset:0;
+      background:
+        radial-gradient(ellipse 80% 60% at 50% 20%,rgba(107,63,160,0.22) 0%,transparent 65%),
+        radial-gradient(ellipse 50% 40% at 30% 80%,rgba(122,26,46,0.28) 0%,transparent 55%),
+        radial-gradient(ellipse 40% 50% at 75% 70%,rgba(122,26,46,0.14) 0%,transparent 50%),
+        linear-gradient(180deg,var(--abyss) 0%,var(--veil) 40%,var(--abyss) 80%,var(--void) 100%);
+    }
+
+    .arch{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:900px}
+    .arch svg{width:100%;display:block}
+
+    .particles{position:absolute;inset:0;pointer-events:none}
+    .p{
+      position:absolute;border-radius:50%;
+      animation:drift linear infinite;opacity:0;
+    }
+    @keyframes drift{
+      0%{opacity:0;transform:translateY(0) scale(1)}
+      10%{opacity:0.5}90%{opacity:0.3}
+      100%{opacity:0;transform:translateY(-80vh) scale(0.5)}
+    }
+
+    .hero-content{position:relative;z-index:10;text-align:center;padding:0 2rem}
+
+    .hero-studio{
+      font-family:'Cormorant SC',serif;font-size:0.65rem;
+      letter-spacing:0.5em;color:var(--violet-mid);margin-bottom:3rem;
+      opacity:0;animation:rise 1.2s ease .2s forwards;
+    }
+
+    .hero-presents{
+      font-family:'Cormorant Garamond',serif;font-size:1rem;
+      font-style:italic;font-weight:300;color:var(--fog);
+      letter-spacing:0.08em;margin-bottom:1.5rem;
+      opacity:0;animation:rise 1.2s ease .5s forwards;
+    }
+
+    .hero-title{
+      font-family:'Uncial Antiqua',serif;
+      font-size:clamp(4rem,13vw,10rem);line-height:0.9;
+      letter-spacing:0.03em;color:var(--ghost);
+      text-shadow:0 0 80px rgba(176,125,232,0.4),0 0 160px rgba(107,63,160,0.2),0 0 8px rgba(220,200,255,0.3);
+      opacity:0;animation:rise 1.4s ease .8s forwards;
+    }
+
+    .hero-sub-row{
+      display:flex;align-items:center;justify-content:center;gap:1.5rem;
+      margin:2rem 0 3rem;
+      opacity:0;animation:rise 1.2s ease 1.2s forwards;
+    }
+    .hl{width:80px;height:1px;background:linear-gradient(to right,transparent,var(--blood))}
+    .hr{width:80px;height:1px;background:linear-gradient(to left,transparent,var(--blood))}
+    .hero-tagline{font-style:italic;font-weight:300;font-size:1.05rem;color:var(--fog);letter-spacing:0.05em}
+
+    .hero-actions{
+      display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;
+      opacity:0;animation:rise 1.2s ease 1.5s forwards;
+    }
+
+    .btn-primary{
+      font-family:'Cormorant SC',serif;font-size:0.72rem;letter-spacing:0.28em;
+      color:var(--ghost);background:linear-gradient(135deg,var(--blood) 0%,var(--violet) 100%);
+      border:none;padding:1rem 2.8rem;text-decoration:none;
+      clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);
+      transition:opacity .3s;cursor:pointer;display:inline-block;
+    }
+    .btn-primary:hover{opacity:0.82}
+
+    .btn-ghost{
+      font-family:'Cormorant SC',serif;font-size:0.72rem;letter-spacing:0.28em;
+      color:var(--fog);background:transparent;
+      border:1px solid rgba(176,125,232,0.25);
+      padding:1rem 2.8rem;text-decoration:none;
+      clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);
+      transition:all .3s;cursor:pointer;display:inline-block;
+    }
+    .btn-ghost:hover{color:var(--lilac);border-color:rgba(176,125,232,0.5)}
+
+    @keyframes rise{
+      from{opacity:0;transform:translateY(28px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+
+    /* FEATURE */
+    .feature{padding:10rem 0;position:relative;overflow:hidden}
+
+    .feature-bg{
+      position:absolute;inset:0;
+      background:
+        radial-gradient(ellipse 60% 70% at 80% 50%,rgba(122,26,46,0.12),transparent 60%),
+        radial-gradient(ellipse 40% 50% at 10% 50%,rgba(107,63,160,0.1),transparent 60%),
+        var(--deep);
+    }
+
+    .feature-inner{
+      max-width:1200px;margin:0 auto;padding:0 5rem;
+      display:grid;grid-template-columns:1fr 1fr;gap:8rem;align-items:center;
+      position:relative;z-index:2;
+    }
+
+    .f-eyebrow{
+      font-family:'Cormorant SC',serif;font-size:0.65rem;letter-spacing:0.4em;
+      color:var(--crimson);display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;
+    }
+    .f-eyebrow::before{content:'';width:30px;height:1px;background:var(--crimson)}
+
+    .f-title{
+      font-family:'Uncial Antiqua',serif;
+      font-size:clamp(2.2rem,4vw,3.5rem);color:var(--ghost);line-height:1.05;margin-bottom:0.5rem;
+    }
+
+    .f-genre{
+      font-style:italic;font-size:0.9rem;color:var(--violet-light);
+      letter-spacing:0.1em;margin-bottom:2rem;
+    }
+
+    .f-body{font-size:1rem;color:var(--fog);line-height:1.8;margin-bottom:1.5rem}
+
+    .f-stats{
+      display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+      background:rgba(176,125,232,0.08);
+      border:1px solid rgba(176,125,232,0.1);margin-top:3rem;
+    }
+    .f-stat{padding:1.5rem 1.2rem;background:var(--deep);text-align:center}
+    .f-stat-val{
+      font-family:'Uncial Antiqua',serif;font-size:1.8rem;color:var(--lilac);display:block;
+    }
+    .f-stat-label{
+      font-family:'Cormorant SC',serif;font-size:0.6rem;letter-spacing:0.2em;
+      color:var(--stone);display:block;margin-top:4px;
+    }
+
+    .mosaic{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto;gap:3px}
+    .mosaic-tile{position:relative;overflow:hidden}
+    .mosaic-tile:first-child{grid-column:1/-1;aspect-ratio:16/7}
+    .mosaic-tile:not(:first-child){aspect-ratio:4/3}
+
+    .tile-bg{width:100%;height:100%;transition:transform .6s ease}
+    .mosaic-tile:hover .tile-bg{transform:scale(1.04)}
+
+    .t1{
+      background:
+        radial-gradient(ellipse at 50% 100%,rgba(122,26,46,0.7) 0%,transparent 60%),
+        radial-gradient(ellipse at 20% 20%,rgba(107,63,160,0.4) 0%,transparent 50%),
+        linear-gradient(160deg,#0e0818,#1a0d28,#08040e);
+    }
+    .t2{
+      background:
+        radial-gradient(ellipse at 50% 80%,rgba(80,10,20,0.8) 0%,transparent 60%),
+        linear-gradient(200deg,#12060c,#1e0e18,#0a0408);
+    }
+    .t3{
+      background:
+        radial-gradient(ellipse at 60% 30%,rgba(107,63,160,0.5) 0%,transparent 55%),
+        linear-gradient(160deg,#0c0820,#141028,#080412);
+    }
+
+    .tile-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(4,3,10,0.7),transparent 50%)}
+    .tile-label{
+      position:absolute;bottom:12px;left:16px;
+      font-family:'Cormorant SC',serif;font-size:0.6rem;
+      letter-spacing:0.25em;color:rgba(210,180,255,0.6);
+    }
+
+    /* RUNE DIVIDER */
+    .rune-div{text-align:center;padding:3rem 0;position:relative}
+    .rune-div::before{
+      content:'';position:absolute;top:50%;left:10%;right:10%;height:1px;
+      background:linear-gradient(to right,transparent,rgba(107,63,160,0.2),rgba(192,54,78,0.2),rgba(107,63,160,0.2),transparent);
+    }
+    .rune-div span{
+      position:relative;font-family:'Uncial Antiqua',serif;font-size:1.4rem;
+      color:rgba(176,125,232,0.3);background:var(--void);
+      padding:0 1.5rem;letter-spacing:0.4em;
+    }
+
+    /* STUDIO */
+    .studio{padding:8rem 0;background:var(--abyss)}
+
+    .studio-inner{max-width:1100px;margin:0 auto;padding:0 5rem}
+
+    .two-col{display:grid;grid-template-columns:1fr 2fr;gap:6rem;align-items:start}
+
+    .s-sticky{position:sticky;top:8rem}
+
+    .s-tag{
+      font-family:'Cormorant SC',serif;font-size:0.65rem;letter-spacing:0.4em;
+      color:var(--violet-mid);margin-bottom:1rem;display:block;
+    }
+
+    .s-title{font-family:'Uncial Antiqua',serif;font-size:2rem;color:var(--ghost);line-height:1.15}
+
+    .s-deco{width:50px;height:1px;background:linear-gradient(to right,var(--violet),var(--crimson));margin:1.5rem 0}
+
+    .s-body{color:var(--fog);font-size:1rem;line-height:1.8;margin-bottom:1.2rem}
+    .s-body:first-of-type{font-size:1.08rem;color:var(--bone)}
+
+    .pillars-list{margin-top:3rem;display:flex;flex-direction:column;gap:1px}
+
+    .pillar{
+      padding:2rem 2.5rem;background:var(--veil);
+      border-left:2px solid rgba(176,125,232,0.15);
+      transition:border-color .3s,background .3s;position:relative;overflow:hidden;
+    }
+    .pillar::after{
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(90deg,rgba(107,63,160,0.05),transparent);
+      opacity:0;transition:opacity .3s;
+    }
+    .pillar:hover{border-color:var(--violet-mid);background:var(--shroud)}
+    .pillar:hover::after{opacity:1}
+
+    .p-num{font-family:'Cormorant SC',serif;font-size:0.6rem;letter-spacing:0.3em;color:var(--violet-mid);margin-bottom:0.5rem}
+    .p-title{font-family:'Cormorant Garamond',serif;font-size:1.05rem;font-weight:600;color:var(--parchment);margin-bottom:0.4rem}
+    .p-body{font-size:0.92rem;color:var(--stone);line-height:1.6}
+
+    /* MANIFESTO */
+    .manifesto{padding:10rem 0;text-align:center;position:relative;overflow:hidden}
+    .manifesto::before{
+      content:'';position:absolute;inset:0;
+      background:radial-gradient(ellipse 50% 60% at 50% 50%,rgba(107,63,160,0.08),transparent),var(--void);
+    }
+
+    .m-inner{position:relative;z-index:2;max-width:780px;margin:0 auto;padding:0 3rem}
+
+    .m-glyph{
+      font-family:'Uncial Antiqua',serif;font-size:5rem;
+      color:var(--violet);opacity:0.18;line-height:1;margin-bottom:1rem;
+    }
+
+    .m-quote{
+      font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;
+      font-size:clamp(1.4rem,2.5vw,2rem);color:var(--parchment);line-height:1.55;
+    }
+
+    .m-rule{width:60px;height:1px;background:linear-gradient(to right,var(--violet),var(--crimson));margin:2rem auto}
+
+    .m-attr{font-family:'Cormorant SC',serif;font-size:0.65rem;letter-spacing:0.35em;color:var(--stone)}
+
+    /* FOOTER */
+    footer{border-top:1px solid rgba(176,125,232,0.08);padding:5rem 5rem 3rem;position:relative}
+
+    .footer-grid{
+      max-width:1100px;margin:0 auto;
+      display:grid;grid-template-columns:2fr 1fr 1fr;gap:4rem;margin-bottom:5rem;
+    }
+
+    .f-logo{font-family:'Uncial Antiqua',serif;font-size:1.8rem;color:var(--violet-light);display:block;margin-bottom:0.75rem}
+    .f-tagline{font-style:italic;font-size:0.95rem;color:var(--stone)}
+
+    .f-col-title{font-family:'Cormorant SC',serif;font-size:0.65rem;letter-spacing:0.3em;color:var(--violet-mid);margin-bottom:1.5rem}
+
+    .f-col ul{list-style:none}
+    .f-col li{margin-bottom:0.6rem}
+    .f-col a{font-size:0.9rem;color:var(--stone);text-decoration:none;transition:color .3s}
+    .f-col a:hover{color:var(--lilac)}
+
+    .footer-base{
+      max-width:1100px;margin:0 auto;
+      display:flex;justify-content:space-between;align-items:center;
+      border-top:1px solid rgba(176,125,232,0.06);padding-top:2rem;
+    }
+
+    .f-copy{font-size:0.8rem;color:var(--mist);font-style:italic}
+    .f-rune{font-family:'Uncial Antiqua',serif;font-size:1rem;color:rgba(176,125,232,0.2);letter-spacing:0.5em}
+
+    @media(max-width:900px){
+      nav{padding:1.5rem 2rem}
+      .n-links{display:none}
+      .feature-inner,.studio-inner{padding:0 1.5rem}
+      .feature-inner,.two-col{grid-template-columns:1fr;gap:3rem}
+      .s-sticky{position:static}
+      .footer-grid{grid-template-columns:1fr;gap:2rem}
+      footer{padding:3rem 1.5rem 2rem}
+      .footer-base{flex-direction:column;gap:1rem;text-align:center}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="n-logo" href="#">Yehnuu</a>
+  <ul class="n-links">
+    <li><a href="#tenebraia">Tenebraia</a></li>
+    <li><a href="#studio">Studio</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-canvas"></div>
+
+  <div class="arch">
+    <svg viewBox="0 0 1200 400" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="af" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1a0d28" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#04030a" stop-opacity="1"/>
+        </linearGradient>
+        <linearGradient id="gv" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#6b3fa0" stop-opacity="0.6"/>
+          <stop offset="100%" stop-color="#6b3fa0" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <rect x="40" y="100" width="80" height="300" fill="url(#af)"/>
+      <rect x="50" y="80" width="60" height="30" fill="#1a0d28"/>
+      <rect x="55" y="50" width="50" height="40" fill="#14112a"/>
+      <rect x="1080" y="100" width="80" height="300" fill="url(#af)"/>
+      <rect x="1090" y="80" width="60" height="30" fill="#1a0d28"/>
+      <rect x="1095" y="50" width="50" height="40" fill="#14112a"/>
+      <path d="M120,300 Q200,100 600,60 Q1000,100 1080,300 L1080,400 L120,400Z" fill="url(#af)" opacity="0.7"/>
+      <path d="M120,300 Q200,100 600,60 Q1000,100 1080,300" fill="none" stroke="url(#gv)" stroke-width="1.5" opacity="0.5"/>
+      <ellipse cx="600" cy="140" rx="12" ry="18" fill="#b07de8" opacity="0.12"/>
+      <ellipse cx="600" cy="140" rx="5" ry="8" fill="#d4b0f0" opacity="0.2"/>
+      <ellipse cx="200" cy="220" rx="6" ry="10" fill="#7a1a2e" opacity="0.3"/>
+      <ellipse cx="1000" cy="220" rx="6" ry="10" fill="#7a1a2e" opacity="0.3"/>
+    </svg>
+  </div>
+
+  <div class="particles" id="particles"></div>
+
+  <div class="hero-content">
+    <p class="hero-studio">Yehnuu Studio</p>
+    <p class="hero-presents">presents</p>
+    <h1 class="hero-title">Tenebraia</h1>
+    <div class="hero-sub-row">
+      <div class="hl"></div>
+      <span class="hero-tagline">Where darkness is the only covenant</span>
+      <div class="hr"></div>
+    </div>
+    <div class="hero-actions">
+      <a href="#tenebraia" class="btn-primary">Discover the World</a>
+      <a href="#studio" class="btn-ghost">About Yehnuu</a>
+    </div>
+  </div>
+</section>
+
+<!-- TENEBRAIA FEATURE -->
+<section class="feature" id="tenebraia">
+  <div class="feature-bg"></div>
+  <div class="feature-inner">
+    <div>
+      <div class="f-eyebrow">Flagship Title</div>
+      <h2 class="f-title">Tenebraia</h2>
+      <p class="f-genre">Dark Fantasy RPG — In Development</p>
+      <p class="f-body">The sun died three hundred years ago. What replaced it is worse than darkness — it is the Veil, a living absence that hungers for the last embers of the world's memory.</p>
+      <p class="f-body">You are a Remnant, one of the few who can touch the Veil without being consumed. The choice before you: snuff the last lights, or feed the darkness itself to forge something new.</p>
+      <div class="f-stats">
+        <div class="f-stat">
+          <span class="f-stat-val">40+</span>
+          <span class="f-stat-label">Hours of Story</span>
+        </div>
+        <div class="f-stat">
+          <span class="f-stat-val">7</span>
+          <span class="f-stat-label">Covenant Factions</span>
+        </div>
+        <div class="f-stat">
+          <span class="f-stat-val">&#8734;</span>
+          <span class="f-stat-label">Consequences</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="mosaic">
+        <div class="mosaic-tile">
+          <div class="tile-bg t1"></div>
+          <div class="tile-overlay"></div>
+          <span class="tile-label">The Veilborn Wastes</span>
+        </div>
+        <div class="mosaic-tile">
+          <div class="tile-bg t2"></div>
+          <div class="tile-overlay"></div>
+          <span class="tile-label">Ashcroft Sanctum</span>
+        </div>
+        <div class="mosaic-tile">
+          <div class="tile-bg t3"></div>
+          <div class="tile-overlay"></div>
+          <span class="tile-label">The Pale Archive</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="rune-div"><span>&#10022; &#10022; &#10022;</span></div>
+
+<!-- STUDIO -->
+<section class="studio" id="studio">
+  <div class="studio-inner">
+    <div class="two-col">
+      <div class="s-sticky">
+        <span class="s-tag">The Studio</span>
+        <h2 class="s-title">Yehnuu</h2>
+        <div class="s-deco"></div>
+        <p class="s-body">An independent RPG studio forging worlds of mythic weight and moral consequence.</p>
+        <p class="s-body">We believe the greatest games are the most honest — honest about darkness, about the cost of power, about what it means to choose.</p>
+      </div>
+      <div class="pillars-list">
+        <div class="pillar">
+          <div class="p-num">I — World</div>
+          <div class="p-title">Breathing Cosmologies</div>
+          <p class="p-body">Our worlds have histories before the first quest begins. Gods died here. Empires fell. The dust still holds their names. Every map edge hides another age waiting to be uncovered.</p>
+        </div>
+        <div class="pillar">
+          <div class="p-num">II — Choice</div>
+          <div class="p-title">Weight Without Escape</div>
+          <p class="p-body">We do not make choices comfortable. Every decision carries a ledger. Alliances break. Silences cost lives. The system remembers what you wish it would forget.</p>
+        </div>
+        <div class="pillar">
+          <div class="p-num">III — Darkness</div>
+          <div class="p-title">Honest Shadows</div>
+          <p class="p-body">We write darkness not as aesthetic but as truth. Grief, complicity, power's corruption — our games go where literature goes, holding nothing back from the player who chooses to look.</p>
+        </div>
+        <div class="pillar">
+          <div class="p-num">IV — Craft</div>
+          <div class="p-title">Systems as Language</div>
+          <p class="p-body">Mechanics are not separate from narrative. In Tenebraia, feeding the Veil is also how you survive. The loop is the metaphor.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MANIFESTO -->
+<section class="manifesto">
+  <div class="m-inner">
+    <div class="m-glyph">&#10016;</div>
+    <blockquote class="m-quote">
+      We do not offer you escape. We offer you descent — and the chance, if you are brave enough, to discover what you truly are in the dark.
+    </blockquote>
+    <div class="m-rule"></div>
+    <p class="m-attr">Yehnuu Studio — Founding Scroll, 2024</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="contact">
+  <div class="footer-grid">
+    <div>
+      <span class="f-logo">Yehnuu</span>
+      <p class="f-tagline">Forge of Worlds.<br>Independent RPG Studio.</p>
+    </div>
+    <div class="f-col">
+      <p class="f-col-title">Navigate</p>
+      <ul>
+        <li><a href="#tenebraia">Tenebraia</a></li>
+        <li><a href="#studio">The Studio</a></li>
+        <li><a href="#">Press Kit</a></li>
+        <li><a href="#">Careers</a></li>
+      </ul>
+    </div>
+    <div class="f-col">
+      <p class="f-col-title">Community</p>
+      <ul>
+        <li><a href="#">Discord</a></li>
+        <li><a href="#">Twitter / X</a></li>
+        <li><a href="#">Newsletter</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-base">
+    <p class="f-copy">&#169; 2026 Yehnuu Studio. All rights reserved.</p>
+    <p class="f-rune">&#10022; &#10022; &#10022; &#10022; &#10022;</p>
+  </div>
+</footer>
+
+<script>
+  const c=document.getElementById('particles');
+  for(let i=0;i<22;i++){
+    const p=document.createElement('div');
+    p.className='p';
+    const sz=Math.random()*2+1;
+    p.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;bottom:${Math.random()*30}%;animation-duration:${8+Math.random()*14}s;animation-delay:${Math.random()*10}s;background:${Math.random()>.5?'#b07de8':'#c0364e'}`;
+    c.appendChild(p);
+  }
+</script>
+</body>
+</html>
